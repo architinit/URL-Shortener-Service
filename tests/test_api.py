@@ -95,6 +95,22 @@ def test_list_links_is_paginated(client):
     assert res_page_2.get_json()["has_next"] is False
 
 
+def test_delete_link_removes_it(client):
+    create_res = client.post("/api/shorten", json={"long_url": "https://example.com/target"})
+    short_code = create_res.get_json()["short_code"]
+
+    del_res = client.delete(f"/api/links/{short_code}")
+    assert del_res.status_code == 204
+
+    res = client.get(f"/{short_code}")
+    assert res.status_code == 404
+
+
+def test_delete_unknown_link_returns_404(client):
+    res = client.delete("/api/links/doesnotexist")
+    assert res.status_code == 404
+
+
 def test_expired_link_returns_410(client):
     create_res = client.post("/api/shorten", json={
         "long_url": "https://example.com/target",

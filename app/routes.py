@@ -112,6 +112,17 @@ def stats(short_code):
     return jsonify(payload)
 
 
+@bp.route("/api/links/<short_code>", methods=["DELETE"])
+def delete_link(short_code):
+    link = Link.query.filter_by(short_code=short_code).first()
+    if link is None:
+        return jsonify({"error": "Short link not found"}), 404
+
+    db.session.delete(link)
+    db.session.commit()
+    return "", 204
+
+
 @bp.route("/api/links")
 def list_links():
     page = max(request.args.get("page", 1, type=int) or 1, 1)

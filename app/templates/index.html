@@ -2,28 +2,66 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>URL Shortener</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <main>
-    <h1>URL Shortener</h1>
-    <form id="shorten-form">
-      <input type="url" id="long-url" placeholder="https://example.com/very/long/link" required>
-      <input type="text" id="custom-alias" placeholder="custom alias (optional)">
-      <input type="number" id="expires-in-days" placeholder="expires in days (optional)" min="0" step="0.5">
-      <button type="submit">Shorten</button>
-    </form>
-    <div id="result"></div>
+    <div class="page-header">
+      <h1>URL Shortener</h1>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">🌙</button>
+    </div>
+    <p class="subtitle">Shorten a link, track clicks, set an expiry — no account needed.</p>
 
-    <h2>Recent Links</h2>
-    <table id="links-table">
-      <thead>
-        <tr><th>Short</th><th>Long URL</th><th>Clicks</th><th>Expires</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <section class="card">
+      <h2>Create a short link</h2>
+      <form id="shorten-form">
+        <div>
+          <label for="long-url">Destination URL</label>
+          <input type="url" id="long-url" placeholder="https://example.com/very/long/link" required>
+        </div>
+        <div class="field-row">
+          <div>
+            <label for="custom-alias">Custom alias (optional)</label>
+            <input type="text" id="custom-alias" placeholder="my-brand">
+          </div>
+          <div>
+            <label for="expires-in-days">Expires in days (optional)</label>
+            <input type="number" id="expires-in-days" placeholder="e.g. 7" min="0" step="0.5">
+          </div>
+        </div>
+        <button type="submit" class="primary" id="submit-btn">Shorten link</button>
+      </form>
+      <div id="result"></div>
+    </section>
+
+    <section>
+      <div class="section-header">
+        <h2>Recent Links</h2>
+        <span class="count" id="links-count"></span>
+      </div>
+      <div class="table-wrap">
+        <table id="links-table">
+          <thead>
+            <tr>
+              <th>Short link</th>
+              <th>Destination</th>
+              <th>Clicks</th>
+              <th>Expiry</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div class="empty-state" id="empty-state" style="display:none;">No links yet — create your first one above.</div>
+      </div>
+      <div class="pagination" id="pagination"></div>
+    </section>
   </main>
+
+  <div class="toast-container" id="toast-container"></div>
+
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>
