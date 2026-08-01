@@ -3,9 +3,9 @@ const resultBox = document.getElementById("result");
 const tableBody = document.querySelector("#links-table tbody");
 
 async function loadLinks() {
-  const res = await fetch("/api/links");
-  const links = await res.json();
-  tableBody.innerHTML = links.map(l => `
+  const res = await fetch("/api/links?page=1&per_page=20");
+  const data = await res.json();
+  tableBody.innerHTML = data.links.map(l => `
     <tr>
       <td><a href="/${l.short_code}" target="_blank">/${l.short_code}</a></td>
       <td>${l.long_url}</td>

@@ -114,5 +114,16 @@ def stats(short_code):
 
 @bp.route("/api/links")
 def list_links():
-    links = Link.query.order_by(Link.created_at.desc()).limit(50).all()
-    return jsonify([l.to_dict() for l in links])
+    page = max(request.args.get("page", 1, type=int) or 1, 1)
+    per_page = min(max(request.args.get("per_page", 20, type=int) or 20, 1), 100)
+
+    pagination = Link.query.order_by(Link.created_at.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+    return jsonify({
+        "links": [l.to_dict() for l in pagination.items],
+        "page": pagination.page,
+        "per_page": per_page,
+        "total": pagination.total,
+        "has_next": pagination.has_next,
+    })

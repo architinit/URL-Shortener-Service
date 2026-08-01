@@ -79,6 +79,22 @@ def test_short_codes_are_unique_and_deterministic(client):
     assert len(codes) == 5
 
 
+def test_list_links_is_paginated(client):
+    for i in range(3):
+        client.post("/api/shorten", json={"long_url": f"https://example.com/page-{i}"})
+
+    res = client.get("/api/links?page=1&per_page=2")
+    assert res.status_code == 200
+    body = res.get_json()
+    assert len(body["links"]) == 2
+    assert body["total"] == 3
+    assert body["has_next"] is True
+
+    res_page_2 = client.get("/api/links?page=2&per_page=2")
+    assert len(res_page_2.get_json()["links"]) == 1
+    assert res_page_2.get_json()["has_next"] is False
+
+
 def test_expired_link_returns_410(client):
     create_res = client.post("/api/shorten", json={
         "long_url": "https://example.com/target",

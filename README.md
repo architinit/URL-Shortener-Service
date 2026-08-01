@@ -15,7 +15,8 @@ analytics, custom aliases, expiring links, and rate limiting.
 ## Architecture
 
 - **Backend**: Flask, application-factory pattern, Blueprint-based routes
-- **Persistence**: SQLAlchemy ORM over SQLite (swap `DATABASE_URL` for Postgres in production)
+- **Persistence**: SQLAlchemy ORM over SQLite (swap `DATABASE_URL` for Postgres in production),
+  schema managed with Flask-Migrate/Alembic
 - **Short code generation**: each link's auto-increment primary key is Base62-encoded and
   zero-padded to a fixed length — collision-free by construction, no retry loop needed
 - **Frontend**: plain HTML/CSS/JS calling the JSON API (no build step required)
@@ -26,10 +27,21 @@ analytics, custom aliases, expiring links, and rate limiting.
 python -m venv venv
 source venv/bin/activate  # or venv\Scripts\activate on Windows
 pip install -r requirements.txt
+export FLASK_APP=run.py  # set FLASK_APP=run.py on Windows
+flask db upgrade
 python run.py
 ```
 
 Visit `http://localhost:5000`.
+
+## Database migrations
+
+Schema changes are managed with Flask-Migrate. After changing a model:
+
+```bash
+flask db migrate -m "describe the change"
+flask db upgrade
+```
 
 ## Running with Docker
 
