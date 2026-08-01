@@ -5,7 +5,7 @@ from app import db
 
 class Link(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    short_code = db.Column(db.String(16), unique=True, nullable=False, index=True)
+    short_code = db.Column(db.String(16), unique=True, nullable=True, index=True)
     long_url = db.Column(db.String(2048), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     expires_at = db.Column(db.DateTime, nullable=True)

@@ -71,6 +71,14 @@ def test_stats_tracks_click_count(client):
     assert stats_res.get_json()["click_count"] == 2
 
 
+def test_short_codes_are_unique_and_deterministic(client):
+    codes = set()
+    for i in range(5):
+        res = client.post("/api/shorten", json={"long_url": f"https://example.com/page-{i}"})
+        codes.add(res.get_json()["short_code"])
+    assert len(codes) == 5
+
+
 def test_expired_link_returns_410(client):
     create_res = client.post("/api/shorten", json={
         "long_url": "https://example.com/target",

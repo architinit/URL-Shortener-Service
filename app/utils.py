@@ -15,10 +15,8 @@ def encode_base62(number: int) -> str:
     return "".join(reversed(chars))
 
 
-def generate_short_code(long_url: str, salt: str, length: int = 6) -> str:
-    digest = hashlib.sha256(f"{long_url}{salt}".encode()).hexdigest()
-    number = int(digest, 16)
-    return encode_base62(number)[:length]
+def short_code_for_id(link_id: int, length: int = 6) -> str:
+    return encode_base62(link_id).rjust(length, ALPHABET[0])
 
 
 def hash_ip(ip: str) -> str:

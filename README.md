@@ -16,8 +16,8 @@ analytics, custom aliases, expiring links, and rate limiting.
 
 - **Backend**: Flask, application-factory pattern, Blueprint-based routes
 - **Persistence**: SQLAlchemy ORM over SQLite (swap `DATABASE_URL` for Postgres in production)
-- **Short code generation**: SHA-256 hash of the URL + a time-based salt, truncated and
-  Base62-encoded, with a collision-check retry loop
+- **Short code generation**: each link's auto-increment primary key is Base62-encoded and
+  zero-padded to a fixed length — collision-free by construction, no retry loop needed
 - **Frontend**: plain HTML/CSS/JS calling the JSON API (no build step required)
 
 ## Running locally

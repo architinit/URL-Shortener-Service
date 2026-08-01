@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, redirect, render_template, request, curren
 
 from app import db, limiter
 from app.models import Click, Link
-from app.utils import generate_short_code, hash_ip
+from app.utils import short_code_for_id, hash_ip
 
 bp = Blueprint("main", __name__)
 
@@ -29,6 +29,7 @@ def shorten():
     if not long_url or not URL_RE.match(long_url):
         return jsonify({"error": "Provide a valid http(s) URL"}), 400
 
+    short_code = None
     if custom_alias:
         if not ALIAS_RE.match(custom_alias):
             return jsonify({"error": "Alias must be 3-16 chars: letters, numbers, - or _"}), 400
@@ -37,13 +38,6 @@ def shorten():
         short_code = custom_alias
         is_custom = True
     else:
-        short_code = generate_short_code(long_url, salt=str(datetime.utcnow().timestamp()),
-                                          length=current_app.config["SHORT_CODE_LENGTH"])
-        attempts = 0
-        while Link.query.filter_by(short_code=short_code).first() and attempts < 5:
-            short_code = generate_short_code(long_url, salt=f"{datetime.utcnow().timestamp()}-{attempts}",
-                                              length=current_app.config["SHORT_CODE_LENGTH"])
-            attempts += 1
         is_custom = False
 
     expires_at = None
@@ -55,6 +49,12 @@ def shorten():
 
     link = Link(short_code=short_code, long_url=long_url, expires_at=expires_at, is_custom_alias=is_custom)
     db.session.add(link)
+
+    if not is_custom:
+        db.session.flush()  # assigns link.id without committing
+        link.short_code = short_code_for_id(link.id, length=current_app.config["SHORT_CODE_LENGTH"])
+        short_code = link.short_code
+
     db.session.commit()
 
     return jsonify({
