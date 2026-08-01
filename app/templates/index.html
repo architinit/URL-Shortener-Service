@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>URL Shortener</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main>
+    <h1>URL Shortener</h1>
+    <form id="shorten-form">
+      <input type="url" id="long-url" placeholder="https://example.com/very/long/link" required>
+      <input type="text" id="custom-alias" placeholder="custom alias (optional)">
+      <input type="number" id="expires-in-days" placeholder="expires in days (optional)" min="0" step="0.5">
+      <button type="submit">Shorten</button>
+    </form>
+    <div id="result"></div>
+
+    <h2>Recent Links</h2>
+    <table id="links-table">
+      <thead>
+        <tr><th>Short</th><th>Long URL</th><th>Clicks</th><th>Expires</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
