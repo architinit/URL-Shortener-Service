@@ -1,5 +1,6 @@
 import hashlib
 import string
+from datetime import datetime, timezone
 
 ALPHABET = string.digits + string.ascii_lowercase + string.ascii_uppercase
 BASE = len(ALPHABET)
@@ -21,3 +22,8 @@ def short_code_for_id(link_id: int, length: int = 6) -> str:
 
 def hash_ip(ip: str) -> str:
     return hashlib.sha256(ip.encode()).hexdigest()[:16]
+
+
+def utcnow() -> datetime:
+    """Naive UTC datetime, matching the (now-deprecated) datetime.utcnow() semantics."""
+    return datetime.now(timezone.utc).replace(tzinfo=None)

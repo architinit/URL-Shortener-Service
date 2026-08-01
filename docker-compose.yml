@@ -4,6 +4,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./data:/app/instance
+      - ./data:/app/data
     environment:
       - SECRET_KEY=dev-secret-key
+      - DATABASE_URL=sqlite:////app/data/shortener.db

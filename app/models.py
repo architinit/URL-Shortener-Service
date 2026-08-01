@@ -1,20 +1,19 @@
-from datetime import datetime
-
 from app import db
+from app.utils import utcnow
 
 
 class Link(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     short_code = db.Column(db.String(16), unique=True, nullable=True, index=True)
     long_url = db.Column(db.String(2048), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utcnow)
     expires_at = db.Column(db.DateTime, nullable=True)
     is_custom_alias = db.Column(db.Boolean, default=False)
 
     clicks = db.relationship("Click", backref="link", lazy="dynamic", cascade="all, delete-orphan")
 
     def is_expired(self):
-        return self.expires_at is not None and datetime.utcnow() > self.expires_at
+        return self.expires_at is not None and utcnow() > self.expires_at
 
     def to_dict(self):
         return {
@@ -29,7 +28,7 @@ class Link(db.Model):
 class Click(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     link_id = db.Column(db.Integer, db.ForeignKey("link.id"), nullable=False)
-    clicked_at = db.Column(db.DateTime, default=datetime.utcnow)
+    clicked_at = db.Column(db.DateTime, default=utcnow)
     referrer = db.Column(db.String(512), nullable=True)
     user_agent = db.Column(db.String(512), nullable=True)
     ip_hash = db.Column(db.String(64), nullable=True)

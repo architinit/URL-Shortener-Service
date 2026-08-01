@@ -1,11 +1,12 @@
 import re
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from flask import Blueprint, jsonify, redirect, render_template, request, current_app
+from sqlalchemy.exc import IntegrityError
 
 from app import db, limiter
 from app.models import Click, Link
-from app.utils import short_code_for_id, hash_ip
+from app.utils import short_code_for_id, hash_ip, utcnow
 
 bp = Blueprint("main", __name__)
 
@@ -43,7 +44,7 @@ def shorten():
     expires_at = None
     if expires_in_days:
         try:
-            expires_at = datetime.utcnow() + timedelta(days=float(expires_in_days))
+            expires_at = utcnow() + timedelta(days=float(expires_in_days))
         except (TypeError, ValueError):
             return jsonify({"error": "expires_in_days must be a number"}), 400
 
@@ -55,7 +56,13 @@ def shorten():
         link.short_code = short_code_for_id(link.id, length=current_app.config["SHORT_CODE_LENGTH"])
         short_code = link.short_code
 
-    db.session.commit()
+    try:
+        db.session.commit()
+    except IntegrityError:
+        # Two requests raced past the pre-check above with the same alias;
+        # the unique constraint is the real source of truth.
+        db.session.rollback()
+        return jsonify({"error": "Alias already taken"}), 409
 
     return jsonify({
         "short_code": short_code,
