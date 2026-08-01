@@ -3,6 +3,10 @@
 A URL shortener built with Flask, going beyond a basic redirect service to include click
 analytics, custom aliases, expiring links, and rate limiting.
 
+**Live demo:** https://url-shortener-service-fa1w.onrender.com
+(hosted on Render's free tier — spins down after inactivity, so the first request after
+a while may take ~30-50s to wake up)
+
 ## Features
 
 - Shorten any valid URL to a 6-character Base62 code
